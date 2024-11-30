@@ -5,7 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px 
-from ydata_profiling import ProfileReport
 from streamlit_option_menu import option_menu
 from streamlit_extras.metric_cards import style_metric_cards
 
@@ -13,7 +12,7 @@ from streamlit_extras.metric_cards import style_metric_cards
 # Preprocessing library
 from sklearn.preprocessing import LabelEncoder,PolynomialFeatures,StandardScaler,RobustScaler,MinMaxScaler,OneHotEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score,root_mean_squared_error,confusion_matrix,accuracy_score,classification_report
+from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score,confusion_matrix,accuracy_score,classification_report
 from sklearn.decomposition import PCA
 ####################################################################
 # Sampling library
