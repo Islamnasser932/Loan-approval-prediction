@@ -948,17 +948,17 @@ elif selected == "Modeling":
     st.write(f"**Purpose of the loan :** {Loan_intent}")
     st.write(f"**Loan grade representing the risk level:** {Loan_grade}")
     st.write(f"**Credit History of defaults (Y for yes, N for no):** {Default_on_file}")
-
+    loan = df.copy()
     # Cached preprocessing and model training
     @st.cache_data
     def preprocess_data(df):
         label = LabelEncoder()
-        object_column = df[['person_home_ownership', 'loan_intent', 'loan_grade', 'cb_person_default_on_file']]
+        object_column = loan[['person_home_ownership', 'loan_intent', 'loan_grade', 'cb_person_default_on_file']]
         for i in object_column:
-            df[i] = label.fit_transform(df[i])
+            loan[i] = label.fit_transform(loan[i])
 
-        X = df.drop(['id', 'loan_status', 'person_emp_length'], axis=1)
-        y = df['loan_status']
+        X = loan.drop(['id', 'loan_status', 'person_emp_length'], axis=1)
+        y = loan['loan_status']
         smote_enn = SMOTEENN(random_state=42)
         X_combined, y_combined = smote_enn.fit_resample(X, y)
         X_train, X_test, y_train, y_test = train_test_split(X_combined, y_combined, test_size=0.2, random_state=42)
