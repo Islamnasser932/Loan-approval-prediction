@@ -261,7 +261,7 @@ elif selected=="Data Aanlysis":
     def metrics():
         col1, col2= st.columns(2)
 
-        col1.metric(label="Total person_income", value= f"{ df_selection.person_income.max()-df.person_income.min():,.0f}")
+        col1.metric(label="Total person_income", value= f"{ df_selection.person_income.sum()-df.person_income.min():,.0f}")
         
         col2.metric(label="Total loan_amnt", value= f"{df_selection.loan_amnt.sum():,.0f}")
 
