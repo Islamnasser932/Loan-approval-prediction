@@ -922,8 +922,8 @@ elif selected == "Modeling":
     Loan_amnt = st.slider("Enter the loan amount", min_value=1, max_value=500000, value=100, step=10)
     formatted_loan_amnt = f"{Loan_amnt}k" if Loan_amnt < 1000 else f"{Loan_amnt / 1000:.1f}M"
     
-    loan_int_rate = st.number_input("Enter the interest rate on the loan", min_value=0, max_value=40, value=0.1, step=1)
-    Loan_percent_income = st.number_input("Enter the loan percent income", min_value=0, max_value=50, value=0.1, step=1)
+    loan_int_rate = st.number_input("Enter the interest rate on the loan", min_value=0, max_value=40, value=1, step=0.1)
+    Loan_percent_income = st.number_input("Enter the loan percent income", min_value=0, max_value=50, value=1, step=0.1)
     
     
     # Map categorical inputs to integers
