@@ -919,11 +919,11 @@ elif selected == "Modeling":
     Person_age = st.slider("Enter the person's age", min_value=18, max_value=100, value=18, step=1) 
     Credit_hist_length = st.slider("Enter credit history length (in years)", min_value=0, max_value=50, value=10, step=1)
     Person_income = st.slider("Enter the person's income", min_value=1000, max_value=4000000, value=50000, step=1000)
-    Loan_amnt = st.slider("Enter the loan amount (in thousands)", min_value=1, max_value=5000, value=100, step=10)
+    Loan_amnt = st.slider("Enter the loan amount", min_value=1, max_value=500000, value=100, step=10)
     formatted_loan_amnt = f"{Loan_amnt}k" if Loan_amnt < 1000 else f"{Loan_amnt / 1000:.1f}M"
     
-    loan_int_rate = st.number_input("Enter the interest rate on the loan", min_value=0, max_value=40, value=1, step=1)
-    Loan_percent_income = st.number_input("Enter the loan percent income", min_value=0, max_value=50, value=1, step=1)
+    loan_int_rate = st.number_input("Enter the interest rate on the loan", min_value=0, max_value=40, value=0.1, step=1)
+    Loan_percent_income = st.number_input("Enter the loan percent income", min_value=0, max_value=50, value=0.1, step=1)
     
     
     # Map categorical inputs to integers
