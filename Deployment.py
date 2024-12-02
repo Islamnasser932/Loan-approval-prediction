@@ -961,7 +961,7 @@ elif selected == "Modeling":
     st.write(f"**Homeownership status:** {Home_ownership}")
     st.write(f"**Purpose of the loan :** {Loan_intent}")
     st.write(f"**Loan grade representing the risk level:** {Loan_grade}")
-    st.write(f"**Credit History of defaults (Y for yes, N for no).:** {Default_on_file} years")
+    st.write(f"**Credit History of defaults (Y for yes, N for no).:** {Default_on_file} ")
 
 
     btn = st.button("Submit")
