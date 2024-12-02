@@ -994,7 +994,7 @@ elif selected == "Modeling":
 
     # using xgboost Classifier
     import xgboost as xgb
-    gb = xgb.XGBClassifier( n_estimators=600,learning_rate=0.08, gamma=0,subsample=0.75,colsample_bytree=1, max_depth=10)
+    gb = xgb.XGBClassifier( n_estimators=300,learning_rate=0.08, gamma=0,subsample=0.75,colsample_bytree=1, max_depth=10)
     gb.fit(X_train,y_train)
    
      
