@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px 
+from ydata_profiling import ProfileReport
 from streamlit_option_menu import option_menu
 from streamlit_extras.metric_cards import style_metric_cards
 
@@ -12,7 +13,7 @@ from streamlit_extras.metric_cards import style_metric_cards
 # Preprocessing library
 from sklearn.preprocessing import LabelEncoder,PolynomialFeatures,StandardScaler,RobustScaler,MinMaxScaler,OneHotEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score,confusion_matrix,accuracy_score,classification_report
+from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score,root_mean_squared_error,confusion_matrix,accuracy_score,classification_report
 from sklearn.decomposition import PCA
 ####################################################################
 # Sampling library
@@ -916,7 +917,6 @@ elif selected == "Modeling":
 
 
     Person_age = st.slider("Enter the person's age", min_value=18, max_value=100, value=18, step=1) 
-    person_emp_length = st.slider("Enter the number of years of employment experience", min_value=0, max_value=40, value=5, step=1)  
     Credit_hist_length = st.slider("Enter credit history length (in years)", min_value=0, max_value=50, value=10, step=1)
     Person_income = st.slider("Enter the person's income", min_value=1000, max_value=4000000, value=50000, step=1000)
     Loan_amnt = st.slider("Enter the loan amount (in thousands)", min_value=1, max_value=5000, value=100, step=10)
@@ -953,7 +953,6 @@ elif selected == "Modeling":
     st.write("### Summary of entered values:")
     st.write(f"**Age:** {Person_age} years")
     st.write(f"**Income:** ${Person_income}")
-    st.write(f"**Employment Length:** {person_emp_length} years")
     st.write(f"**Interest Rate:** {loan_int_rate}%")
     st.write(f"**Loan Amount:** ${Loan_amnt}")
     st.write(f"**Loan Percent Income:** {Loan_percent_income}%")
@@ -975,7 +974,7 @@ elif selected == "Modeling":
         loan[i]=label.fit_transform(loan[i])
     
     # spltting the data
-    X=loan.drop(['id','loan_status'],axis=1)
+    X=loan.drop(['id','loan_status','person_emp_length'],axis=1)
     y=loan['loan_status']
 
     # Combined (Hybrid) Sampling
@@ -1002,7 +1001,7 @@ elif selected == "Modeling":
     
     if btn:
         # Prepare input data
-        input_data = [ Person_age,Person_income, Loan_amnt, Loan_percent_income, Credit_hist_length, person_emp_length, loan_int_rate ]
+        input_data = [ Person_age,Person_income, Loan_amnt, Loan_percent_income, Credit_hist_length, loan_int_rate ]
         
         # Encode categorical values as integers
         category_mapping = {
