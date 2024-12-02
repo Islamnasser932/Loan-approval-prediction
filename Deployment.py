@@ -999,37 +999,37 @@ elif selected == "Modeling":
    
      
     
-if btn:
-    # Prepare input data
-    input_data = [Person_age, Person_income, Loan_amnt, Loan_percent_income, Credit_hist_length, loan_int_rate]
+    if btn:
+        # Prepare input data
+        input_data = [Person_age, Person_income, Loan_amnt, Loan_percent_income, Credit_hist_length, loan_int_rate]
+        
+        # Encode categorical values as integers
+        category_mapping = {
+            "Home_ownership": {'RENT': 0, 'OWN': 1, 'MORTGAGE': 2, 'OTHER': 3},
+            "Loan_intent": {'EDUCATION': 0, 'MEDICAL': 1, 'VENTURE': 2, 'PERSONAL': 3, 'HOMEIMPROVEMENT': 4},
+            "Loan_grade": {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6},
+            "Default_on_file": {'Y': 1, 'N': 0}
+        }
+        
+        Home_ownership = category_mapping['Home_ownership'][Home_ownership]
+        Loan_intent = category_mapping['Loan_intent'][Loan_intent]
+        Loan_grade = category_mapping['Loan_grade'][Loan_grade]
+        Default_on_file = category_mapping['Default_on_file'][Default_on_file]
+        
+        # Extend input data with encoded categorical features
+        input_data.extend([Home_ownership, Loan_intent, Loan_grade, Default_on_file])
+        
+        # Convert input data into a DataFrame with column names matching training data
+        input_data_df = pd.DataFrame([input_data], columns=X.columns)
+        
+        # Scale input data
+        input_data_scaled = scaler.transform(input_data_df)
+        
+        # Predict the loan status
+        result = gb.predict(input_data_scaled)
+        
+        if result[0] == 1:
+            st.success("Loan Approved ✅")
+        else:
+            st.error("Loan Rejected ❌")
     
-    # Encode categorical values as integers
-    category_mapping = {
-        "Home_ownership": {'RENT': 0, 'OWN': 1, 'MORTGAGE': 2, 'OTHER': 3},
-        "Loan_intent": {'EDUCATION': 0, 'MEDICAL': 1, 'VENTURE': 2, 'PERSONAL': 3, 'HOMEIMPROVEMENT': 4},
-        "Loan_grade": {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6},
-        "Default_on_file": {'Y': 1, 'N': 0}
-    }
-    
-    Home_ownership = category_mapping['Home_ownership'][Home_ownership]
-    Loan_intent = category_mapping['Loan_intent'][Loan_intent]
-    Loan_grade = category_mapping['Loan_grade'][Loan_grade]
-    Default_on_file = category_mapping['Default_on_file'][Default_on_file]
-    
-    # Extend input data with encoded categorical features
-    input_data.extend([Home_ownership, Loan_intent, Loan_grade, Default_on_file])
-    
-    # Convert input data into a DataFrame with column names matching training data
-    input_data_df = pd.DataFrame([input_data], columns=X.columns)
-    
-    # Scale input data
-    input_data_scaled = scaler.transform(input_data_df)
-    
-    # Predict the loan status
-    result = gb.predict(input_data_scaled)
-    
-    if result[0] == 1:
-        st.success("Loan Approved ✅")
-    else:
-        st.error("Loan Rejected ❌")
-
