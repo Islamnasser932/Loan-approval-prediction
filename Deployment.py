@@ -912,31 +912,43 @@ elif selected == "Modeling":
     st.title("ML Loan Prediction")
     st.text("In this app, we will classify the Loan Status (0 for rejected, 1 for approved).")
     st.text("Please enter the following values:")
+    
+# Input for all required features as integers
 
-    # Input for all required features as integers
+
     Person_age = st.slider("Enter the person's age", min_value=18, max_value=100, value=18, step=1) 
     Credit_hist_length = st.slider("Enter credit history length (in years)", min_value=0, max_value=50, value=10, step=1)
     Person_income = st.slider("Enter the person's income", min_value=1000, max_value=4000000, value=50000, step=1000)
     Loan_amnt = st.slider("Enter the loan amount (in thousands)", min_value=1, max_value=5000, value=100, step=10)
     formatted_loan_amnt = f"{Loan_amnt}k" if Loan_amnt < 1000 else f"{Loan_amnt / 1000:.1f}M"
+    
     loan_int_rate = st.number_input("Enter the interest rate on the loan", min_value=0, max_value=40, value=1, step=1)
     Loan_percent_income = st.number_input("Enter the loan percent income", min_value=0, max_value=50, value=1, step=1)
-
+    
+    
     # Map categorical inputs to integers
     col1, col2, col3, col4 = st.columns(4)
+
     with col1:
+        # Home Ownership
         st.write("**Home Ownership**")
         Home_ownership = st.radio("Select ownership type", ['RENT', 'OWN', 'MORTGAGE', 'OTHER'], key="home")
+
     with col2:
+        # Loan Intent
         st.write("**Loan Intent**")
         Loan_intent = st.radio("Purpose of loan", ['EDUCATION', 'MEDICAL', 'VENTURE', 'PERSONAL', 'HOMEIMPROVEMENT'], key="intent")
+
     with col3:
+        # Loan Grade
         st.write("**Loan Grade**")
         Loan_grade = st.radio("Risk level", ['A', 'B', 'C', 'D', 'E', 'F', 'G'], key="grade")
+
     with col4:
+        # Default on File
         st.write("**Default on File**")
         Default_on_file = st.radio("History of defaults", ['Y', 'N'], key="default")
-
+        
     # Display entered values
     st.write("### Summary of entered values:")
     st.write(f"**Age:** {Person_age} years")
@@ -948,60 +960,72 @@ elif selected == "Modeling":
     st.write(f"**Homeownership status:** {Home_ownership}")
     st.write(f"**Purpose of the loan :** {Loan_intent}")
     st.write(f"**Loan grade representing the risk level:** {Loan_grade}")
-    st.write(f"**Credit History of defaults (Y for yes, N for no):** {Default_on_file}")
-    loan = df.copy()
-    # Cached preprocessing and model training
-    @st.cache_data
-    def preprocess_data(df):
-        label = LabelEncoder()
-        object_column = loan[['person_home_ownership', 'loan_intent', 'loan_grade', 'cb_person_default_on_file']]
-        for i in object_column:
-            loan[i] = label.fit_transform(loan[i])
+    st.write(f"**Credit History of defaults (Y for yes, N for no).:** {Default_on_file} years")
 
-        X = loan.drop(['id', 'loan_status', 'person_emp_length'], axis=1)
-        y = loan['loan_status']
-        smote_enn = SMOTEENN(random_state=42)
-        X_combined, y_combined = smote_enn.fit_resample(X, y)
-        X_train, X_test, y_train, y_test = train_test_split(X_combined, y_combined, test_size=0.2, random_state=42)
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
-        return X_train, X_test, y_train, y_test, scaler
 
-    @st.cache_resource
-    def train_model(X_train, y_train):
-        gb = xgb.XGBClassifier(n_estimators=600, learning_rate=0.08, gamma=0, subsample=0.75, colsample_bytree=1, max_depth=10)
-        gb.fit(X_train, y_train)
-        return gb
+    btn = st.button("Submit")
+    
+    loan=df.copy()
+    # encoding the data 
+    label=LabelEncoder()
+    object_column=loan[['person_home_ownership','loan_intent','loan_grade','cb_person_default_on_file']]
+    
+    for i in object_column:
+        loan[i]=label.fit_transform(loan[i])
+    
+    # spltting the data
+    X=loan.drop(['id','loan_status','person_emp_length'],axis=1)
+    y=loan['loan_status']
 
-    # Preprocess and train model
-    loan = df.copy()
-    X_train, X_test, y_train, y_test, scaler = preprocess_data(loan)
-    gb = train_model(X_train, y_train)
+    # Combined (Hybrid) Sampling
+    from imblearn.combine import SMOTEENN
 
-    # User input handling and prediction
-    if st.button("Submit"):
-        input_data = [Person_age, Person_income, Loan_amnt, Loan_percent_income, Credit_hist_length, loan_int_rate]
+    smote_enn = SMOTEENN(random_state=42)
+    X_combined, y_combined = smote_enn.fit_resample(X, y)
 
-        # Encode categorical values
+    print(f"Original dataset shape: {Counter(y)}")
+    print(f"Combined SMOTEENN dataset shape: {Counter(y_combined)}")
+    
+    X_train,X_test,y_train,y_test=train_test_split(X_combined,y_combined,test_size=0.2,random_state=42)
+    
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
+    # using xgboost Classifier
+    import xgboost as xgb
+    gb = xgb.XGBClassifier( n_estimators=600,learning_rate=0.08, gamma=0,subsample=0.75,colsample_bytree=1, max_depth=10)
+    gb.fit(X_train,y_train)
+   
+     
+    
+    if btn:
+        # Prepare input data
+        input_data = [ Person_age,Person_income, Loan_amnt, Loan_percent_income, Credit_hist_length, loan_int_rate ]
+        
+        # Encode categorical values as integers
         category_mapping = {
             "Home_ownership": {'RENT': 0, 'OWN': 1, 'MORTGAGE': 2, 'OTHER': 3},
             "Loan_intent": {'EDUCATION': 0, 'MEDICAL': 1, 'VENTURE': 2, 'PERSONAL': 3, 'HOMEIMPROVEMENT': 4},
             "Loan_grade": {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6},
             "Default_on_file": {'Y': 1, 'N': 0}
         }
-        input_data.extend([
-            category_mapping['Home_ownership'][Home_ownership],
-            category_mapping['Loan_intent'][Loan_intent],
-            category_mapping['Loan_grade'][Loan_grade],
-            category_mapping['Default_on_file'][Default_on_file]
-        ])
-
-        # Scale input data and predict
+        
+        Home_ownership = category_mapping['Home_ownership'][Home_ownership]
+        Loan_intent = category_mapping['Loan_intent'][Loan_intent]
+        Loan_grade = category_mapping['Loan_grade'][Loan_grade]
+        Default_on_file = category_mapping['Default_on_file'][Default_on_file]
+        
+        input_data.extend([Home_ownership, Loan_intent, Loan_grade, Default_on_file])
+        
+        # Scale input data
         input_data = scaler.transform([input_data])
+        
+        # Predict the loan status
         result = gb.predict(input_data)
+        
         if result == 1:
             st.success("Loan Approved ✅")
         else:
             st.error("Loan Rejected ❌")
-
+            
